@@ -34,7 +34,7 @@ export default function Program6() {
 
     return (
         <>
-            <Container>
+            <Container className='mt-5'>
                 <h1>Program 6</h1>
                 <Row>
                     <Col>

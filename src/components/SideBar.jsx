@@ -1,8 +1,13 @@
 // Sidebar.js
-import React from 'react';
+import React, { useContext } from 'react';
 import './css/sidebar.css';
+import { UserContext } from '../context/UserContextProvider';
 
 function Sidebar() {
+  const { user } = useContext(UserContext);
+  console.log("User Name : ", user.name);
+  console.log("User Login Status : ", user.loggedIn);
+
   return (
     <aside className="sidebar">
       <div className="sidebar-content">
