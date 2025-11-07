@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useTheme } from "../context/ThemeContextProvider";
@@ -120,7 +120,7 @@ export default function TheMovieDB() {
                                                 boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
                                             }}
                                         >
-                                            {Math.round(movie.vote_average * 10)}
+                                            {Math.round(movie.vote_average * 10)}%
                                         </div>
 
                                         <div className="mt-3">
