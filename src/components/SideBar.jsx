@@ -1,30 +1,76 @@
-// Sidebar.js
 import React, { useContext } from 'react';
-import './css/sidebar.css';
-import { UserContext } from '../context/UserContextProvider';
+// import { UserContext } from '../context/UserContextProvider';
+import { useTheme } from '../context/ThemeContextProvider';
+import { Link, useLocation } from 'react-router-dom';
 
 function Sidebar() {
-  const { user } = useContext(UserContext);
-  console.log("User Name : ", user.name);
-  console.log("User Login Status : ", user.loggedIn);
+  const { theme } = useTheme();
+  // const { user } = useContext(UserContext);
+  const location = useLocation();
+
+  const navItems = [
+    { path: '/Program1', label: 'Program 1' },
+    { path: '/Program2', label: 'Program 2' },
+    { path: '/Program3', label: 'Program 3' },
+    { path: '/Program4', label: 'Program 4' },
+    { path: '/Program5', label: 'Program 5' },
+    { path: '/Program6', label: 'Program 6' },
+    { path: '/Program7', label: 'Program 7' },
+    { path: '/Program8', label: 'Program 8' },
+    { path: '/Program9', label: 'Program 9' },
+    { path: '/TheMovieDB', label: 'The Movie DB' },
+  ];
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-content">
-        <h2 className="sidebar-title">React Tranning Tasks</h2>
-        <ul className="sidebar-menu">
-          <li><a href="/Program1">Program1</a></li>
-          <li><a href="/Program2">Program2</a></li>
-          <li><a href="/Program3">Program3</a></li>
-          <li><a href="/Program4">Program4</a></li>
-          <li><a href="/Program5">Program5</a></li>
-          <li><a href="/Program6">Program6</a></li>
-          <li><a href="/Program7">Program7</a></li>
-          <li><a href="/Program8">Program8</a></li>
-          <li><a href="/Program9">Program9</a></li>
-          <li><a href="/TheMovieDB">The Movie DB</a></li>
+    <aside 
+      className={`${theme === 'dark' ? 'bg-dark text-light border-end border-secondary' : 'bg-light text-dark border-end'} p-4`} 
+      style={{ 
+        width: '250px', 
+        minHeight: '100vh',
+        position: 'sticky',
+        top: 0,
+        overflowY: 'auto'
+      }}
+    >
+      <nav>
+        <ul className="nav flex-column">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path} className="nav-item mb-1">
+                <Link 
+                  className={`nav-link rounded ${
+                    isActive 
+                      ? theme === 'dark' 
+                        ? 'bg-primary text-white' 
+                        : 'bg-primary text-white'
+                      : theme === 'dark' 
+                        ? 'text-light' 
+                        : 'text-dark'
+                  }`}
+                  to={item.path}
+                  style={{
+                    transition: 'all 0.3s',
+                    padding: '0.75rem 1rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
-      </div>
+      </nav>
     </aside>
   );
 }
