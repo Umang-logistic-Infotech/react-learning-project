@@ -3,34 +3,53 @@ import { Button, Form, Container } from 'react-bootstrap';
 import { useTheme } from '../context/ThemeContextProvider';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function LoginPage() {
   const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   async function authorize() {
-        const payload = {
-          email:email,
-          password:password,
-        }
-        try {
-            const response = await axios.post("https://api.escuelajs.co/api/v1/auth/login",payload);
-            localStorage.setItem('token',response.data.access_token);
-            navigate("/Home")
-            
-            alert("success");
-
-        } catch (err) {
-            console.error(err);
-        }
+    const payload = { email, password };
+    try {
+      const response = await axios.post("http://localhost:5000/authorize", payload);
+      if (response.data.message === 'success') {
+        toast.success("Login successful!",{position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'colored'
+        });
+        localStorage.setItem('token', response.data.access_token);
+        navigate("/home");
+      } else if (response.data.message === 'Unauthorized') {
+        toast.error("You are not registered.. please Sign Up First",{
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'colored'
+        });
+      } else {
+        toast.error("Invalid email or password");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("There was an error processing your request.");
     }
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     authorize();
-
   };
 
   return (

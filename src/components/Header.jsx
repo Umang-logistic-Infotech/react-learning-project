@@ -2,11 +2,13 @@ import React, { useContext } from 'react';
 import { useTheme } from '../context/ThemeContextProvider';
 import { Dropdown } from 'react-bootstrap';
 import { UserContext } from '../context/UserContextProvider';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Header() {
   const { theme, toggleTheme } = useTheme();
   const { user } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const navItems = [
     { path: '/labs', label: 'Labs' },
@@ -15,6 +17,21 @@ function Header() {
     { path: '/checkbox', label: 'CheckBox' },
     { path: '/radio', label: 'Radio' },
   ];
+
+  function handleLogout() {
+    localStorage.removeItem('token');
+      toast.info("Logout successful",{
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored"
+      });
+    navigate('/'); 
+  }
 
   const renderLink = (path, label) => (
     <Link 
@@ -40,7 +57,6 @@ function Header() {
       <div className="container-fluid d-flex justify-content-between align-items-center">
         <h1 className="m-0">React Training Tasks</h1>
 
-        {/* Map over navItems to render links */}
         <div className="d-flex gap-3">
           {navItems.map(item => renderLink(item.path, item.label))}
         </div>
@@ -59,7 +75,6 @@ function Header() {
             </label>
           </div>
 
-          {/* User dropdown or Login/Signup */}
           {user.loggedIn ? (
             <Dropdown>
               <Dropdown.Toggle
@@ -70,7 +85,7 @@ function Header() {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item as={Link} to="/profile">My Profile</Dropdown.Item>
-                <Dropdown.Item as={Link} to="/settings">Settings</Dropdown.Item>
+                <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (

@@ -19,6 +19,7 @@ import TextField from "./Pages/TextField";
 import Select from "./Pages/Select";
 import CheckBox from "./Pages/CheckBox";
 import RadioButton from "./Pages/RadioButton";
+import { ToastContainer } from 'react-toastify';
 
 
 function ProtectedRoute({ children }) {
@@ -34,6 +35,17 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <ThemeContextProvider>
+            <ToastContainer 
+        position="top-right" 
+        autoClose={4000} 
+        hideProgressBar 
+        newestOnTop 
+        closeButton 
+        rtl={false} 
+        pauseOnFocusLoss 
+        draggable 
+        pauseOnHover stacked
+      />
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/Login" replace />} />

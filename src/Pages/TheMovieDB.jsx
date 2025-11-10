@@ -44,6 +44,7 @@ export default function TheMovieDB() {
 
     useEffect(() => {
         fetchMovies();
+        // eslint-disable-next-line
     }, [page]);
 
     return (

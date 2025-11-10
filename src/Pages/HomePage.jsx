@@ -6,6 +6,7 @@ import { Container } from 'react-bootstrap';
 import { Outlet } from 'react-router-dom';
 
 export default function HomePage() {
+  
   return (
     <UserContextProvider>
       <div className="d-flex flex-column" style={{ minHeight: '100vh' }}>
