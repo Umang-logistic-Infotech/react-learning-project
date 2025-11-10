@@ -14,6 +14,11 @@ import LoginPage from './Pages/LoginPage';
 import SignUpPage from './Pages/SignUpPage';
 import { ThemeContextProvider } from "./context/ThemeContextProvider";
 import HomePage from "./Pages/HomePage";
+import Labs from "./Pages/Labs";
+import TextField from "./Pages/TextField";
+import Select from "./Pages/Select";
+import CheckBox from "./Pages/CheckBox";
+import RadioButton from "./Pages/RadioButton";
 
 
 function ProtectedRoute({ children }) {
@@ -48,6 +53,11 @@ function App() {
             <Route path="Program9" element={<Program9 />} />
             <Route path="TheMovieDB" element={<TheMovieDB />} />
             <Route path="TheMovieDB/:movieId" element={<MovieDetail />} />
+            <Route path="labs" element={<Labs />} />
+            <Route path="textfield" element={<TextField/>} />
+            <Route path="select" element={<Select/>} />
+            <Route path="checkbox" element={<CheckBox/>} />
+            <Route path="radio" element={<RadioButton />} />
           </Route>
         </Routes>
       </Router>

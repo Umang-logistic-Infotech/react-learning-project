@@ -1,0 +1,4 @@
+Next week task :-   
+    pass data from chield to parent,
+    read and perform docs,
+    implement redux demo example

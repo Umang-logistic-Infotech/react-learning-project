@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useTheme } from "../context/ThemeContextProvider";
@@ -16,10 +16,17 @@ export default function TheMovieDB() {
     async function fetchMovies() {
         setLoading(true);
         try {
-            const response = await axios.get("https://api.themoviedb.org/3/discover/movie", {
-                params: { page: `${page}` },
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const response = await axios.get(
+                "https://api.themoviedb.org/3/discover/movie",
+                {
+                    params: {
+                        page: `${page}`,
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             setMovies((prev) => [...prev, ...response.data.results]);
             setTotalPages(response.data.total_pages);
             setError(null);
@@ -32,7 +39,7 @@ export default function TheMovieDB() {
     }
 
     function handlePage() {
-        setPage((prev) => prev + 1);
+        setPage((prevPage) => prevPage + 1);
     }
 
     useEffect(() => {
@@ -40,125 +47,122 @@ export default function TheMovieDB() {
     }, [page]);
 
     return (
-        <div
-            className={`${theme === "dark" ? "bg-dark text-light" : "bg-light text-dark"}`}
-            style={{ minHeight: "100vh", paddingBottom: "2rem" }}
+        <div 
+            className={`${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`}
+            style={{ paddingBottom: '2rem' }}
         >
-            <Container className="pt-4">
+            <Container fluid className="">
                 <h1 className="text-center mb-4">
                     Movie List (Page {page} of {totalPages})
                 </h1>
 
-                {error && <p className="text-danger text-center">{error}</p>}
+                {error && (
+                    <div className="alert alert-danger text-center" role="alert">
+                        {error}
+                    </div>
+                )}
 
-                <Row className="row-cols-lg-5 d-flex justify-content-center" id="movieContainer">
+                <Row className="g-3 justify-content-center">
                     {movies.length > 0 ? (
-                        movies.map((movie) => (
-                            <Col key={movie.id} className="mb-4 d-flex justify-content-center">
-                                <a
-                                    href={`/TheMovieDB/${movie.id}`}
-                                    style={{ textDecoration: "none", color: "inherit" }}
-                                >
-                                    <div
-                                        className={`movie-card shadow-sm rounded ${
-                                            theme === "dark"
-                                                ? "bg-secondary text-light"
-                                                : "bg-white border"
-                                        } position-relative text-center p-2`}
-                                        style={{
-                                            transition: "transform 0.3s, box-shadow 0.3s",
-                                            height: "450px",
-                                            width: "220px",
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.transform = "translateY(-5px)";
-                                            e.currentTarget.style.boxShadow =
-                                                theme === "dark"
-                                                    ? "0 6px 12px rgba(255,255,255,0.15)"
-                                                    : "0 6px 12px rgba(0,0,0,0.15)";
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = "translateY(0)";
-                                            e.currentTarget.style.boxShadow = "";
-                                        }}
+                        movies.map((movie) => {
+                            const vote = Math.round(movie.vote_average * 10);
+                            const posterPath = movie.poster_path 
+                                ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                                : 'https://via.placeholder.com/200x300?text=No+Image';
+                            
+                            return (
+                                <Col key={movie.id} xs={12} sm={6} md={4} lg={3} xxl={2} className="d-flex justify-content-center" style={{ maxWidth: '20%', flex: '0 0 20%' }}>
+                                    <a
+                                        href={`/TheMovieDB/${movie.id}`}
+                                        style={{ textDecoration: "none", color: "inherit", width: '100%', maxWidth: '220px' }}
                                     >
-                                        <img
-                                            src={
-                                                movie.poster_path
-                                                    ? `https://image.tmdb.org/t/p/original${movie.poster_path}`
-                                                    : "https://via.placeholder.com/200x300?text=No+Image"
-                                            }
-                                            alt={movie.title}
-                                            className="border rounded"
-                                            width="200"
-                                            height="300"
-                                            style={{ objectFit: "cover" }}
-                                            onError={(e) => {
-                                                e.target.src =
-                                                    "https://via.placeholder.com/200x300?text=No+Image";
-                                            }}
-                                        />
-
                                         <div
-                                            className="rounded-circle position-absolute border text-white"
-                                            style={{
-                                                backgroundColor:
-                                                    Math.round(movie.vote_average * 10) >= 70
-                                                        ? "#21d07a"
-                                                        : Math.round(movie.vote_average * 10) >= 50
-                                                        ? "#d2d531"
-                                                        : "#db2360",
-                                                top: "285px",
-                                                left: "30px",
-                                                fontSize: "0.9rem",
-                                                fontWeight: "bold",
-                                                width: "40px",
-                                                height: "40px",
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                                            className={`movie-card shadow rounded ${
+                                                theme === "dark" ? "bg-secondary text-light" : "bg-white border"
+                                            } position-relative text-center p-3`}
+                                            style={{ 
+                                                transition: "transform 0.3s, box-shadow 0.3s", 
+                                                height: "100%",
+                                                minHeight: "400px"
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.transform = "translateY(-5px)";
+                                                e.currentTarget.style.boxShadow = theme === 'dark' 
+                                                    ? "0 8px 16px rgba(255,255,255,0.2)" 
+                                                    : "0 8px 16px rgba(0,0,0,0.2)";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform = "translateY(0)";
+                                                e.currentTarget.style.boxShadow = "";
                                             }}
                                         >
-                                            {Math.round(movie.vote_average * 10)}%
-                                        </div>
-
-                                        <div className="mt-3">
-                                            <div
-                                                className="fs-6 fw-bold text-break"
-                                                style={{
-                                                    minHeight: "2.4rem",
-                                                    display: "-webkit-box",
-                                                    WebkitLineClamp: "2",
-                                                    WebkitBoxOrient: "vertical",
-                                                    overflow: "hidden",
-                                                }}
-                                            >
-                                                {movie.title}
+                                            <div className="position-relative" style={{ marginBottom: "1rem" }}>
+                                                <img
+                                                    src={posterPath}
+                                                    alt={movie.title}
+                                                    className="rounded w-100"
+                                                    style={{ 
+                                                        objectFit: "cover", 
+                                                        height: "300px",
+                                                        display: "block"
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = 'https://via.placeholder.com/200x300?text=No+Image';
+                                                    }}
+                                                />
+                                                <div
+                                                    className="rounded-circle border border-2 border-white position-absolute"
+                                                    style={{
+                                                        backgroundColor: vote >= 70 ? "#21d07a" : vote >= 50 ? "#d2d531" : "#db2360",
+                                                        bottom: "-20px",
+                                                        left: "10px",
+                                                        fontSize: "0.85rem",
+                                                        fontWeight: "bold",
+                                                        width: "40px",
+                                                        height: "40px",
+                                                        display: "flex",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                        color: "white",
+                                                        boxShadow: "0 2px 8px rgba(0,0,0,0.3)"
+                                                    }}
+                                                >
+                                                    {vote}%
+                                                </div>
                                             </div>
-                                            <div
-                                                className={`${
-                                                    theme === "dark" ? "text-light" : "text-muted"
-                                                }`}
-                                                style={{ fontSize: "0.85rem" }}
-                                            >
-                                                {movie.release_date
-                                                    ? new Date(
-                                                          movie.release_date
-                                                      ).toLocaleDateString("en-US", {
-                                                          month: "short",
-                                                          day: "numeric",
-                                                          year: "numeric",
-                                                      })
-                                                    : "No release date"}
+                                            <div className="mt-4">
+                                                <div 
+                                                    className="fw-bold mb-2" 
+                                                    style={{ 
+                                                        fontSize: "1rem", 
+                                                        lineHeight: "1.2",
+                                                        minHeight: "2.4rem",
+                                                        display: "-webkit-box",
+                                                        WebkitLineClamp: "2",
+                                                        WebkitBoxOrient: "vertical",
+                                                        overflow: "hidden"
+                                                    }}
+                                                >
+                                                    {movie.title}
+                                                </div>
+                                                <div 
+                                                    className={`${theme === 'dark' ? 'text-light' : 'text-muted'}`}
+                                                    style={{ fontSize: "0.875rem" }}
+                                                >
+                                                    {movie.release_date ? new Date(movie.release_date).toLocaleDateString('en-US', { 
+                                                        month: 'short', 
+                                                        day: 'numeric', 
+                                                        year: 'numeric' 
+                                                    }) : 'No release date'}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </a>
-                            </Col>
-                        ))
+                                    </a>
+                                </Col>
+                            );
+                        })
                     ) : (
-                        <p className="text-center">Loading movies...</p>
+                        !loading && <p className="text-center col-12">No movies found.</p>
                     )}
                 </Row>
 
@@ -174,10 +178,12 @@ export default function TheMovieDB() {
                     <div className="text-center mt-5">
                         <Button
                             onClick={handlePage}
-                            className={`px-5 py-2 ${
-                                theme === "dark" ? "btn-outline-light" : "btn-outline-dark"
-                            }`}
+                            className={`px-5 py-2 ${theme === "dark" ? "btn-outline-light" : "btn-outline-dark"}`}
                             disabled={loading}
+                            style={{ 
+                                minWidth: "150px",
+                                transition: "all 0.3s"
+                            }}
                         >
                             {loading ? "Loading..." : "Load More"}
                         </Button>

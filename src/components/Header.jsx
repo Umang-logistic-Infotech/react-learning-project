@@ -1,19 +1,49 @@
 import React, { useContext } from 'react';
 import { useTheme } from '../context/ThemeContextProvider';
-import {  Dropdown } from 'react-bootstrap';
+import { Dropdown } from 'react-bootstrap';
 import { UserContext } from '../context/UserContextProvider';
 import { Link } from 'react-router-dom';
 
 function Header() {
   const { theme, toggleTheme } = useTheme();
-    // const { user.loggedIn } = UserContext();
   const { user } = useContext(UserContext);
-  console.log(user.loggedIn);
+
+  const navItems = [
+    { path: '/labs', label: 'Labs' },
+    { path: '/textfield', label: 'TextField' },
+    { path: '/select', label: 'Select' },
+    { path: '/checkbox', label: 'CheckBox' },
+    { path: '/radio', label: 'Radio' },
+  ];
+
+  const renderLink = (path, label) => (
+    <Link 
+      className="nav-link rounded"
+      to={path}
+      style={{
+        transition: 'all 0.3s',
+        padding: '0.75rem 1rem'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+      }}
+    >
+      {label}
+    </Link>
+  );
+
   return (
-    // {user && 
     <header className={`${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'} p-3`}>
       <div className="container-fluid d-flex justify-content-between align-items-center">
         <h1 className="m-0">React Training Tasks</h1>
+
+        {/* Map over navItems to render links */}
+        <div className="d-flex gap-3">
+          {navItems.map(item => renderLink(item.path, item.label))}
+        </div>
 
         <div className="d-flex align-items-center">
           <div className="form-check form-switch me-3">
@@ -28,6 +58,8 @@ function Header() {
               {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
             </label>
           </div>
+
+          {/* User dropdown or Login/Signup */}
           {user.loggedIn ? (
             <Dropdown>
               <Dropdown.Toggle
@@ -37,9 +69,8 @@ function Header() {
                 Profile
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item  to="/profile">My Profile</Dropdown.Item>
-                <Dropdown.Item  to="/settings">Settings</Dropdown.Item>
-                {/* <Dropdown.Item onClick={() => setUser({ loggedIn: false })}>Logout</Dropdown.Item> */}
+                <Dropdown.Item as={Link} to="/profile">My Profile</Dropdown.Item>
+                <Dropdown.Item as={Link} to="/settings">Settings</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (
@@ -61,7 +92,6 @@ function Header() {
         </div>
       </div>
     </header>
-    // }
   );
 }
 
