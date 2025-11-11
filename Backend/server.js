@@ -1,83 +1,77 @@
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 5000;
-const mysql = require('mysql');
-const cors = require('cors');
-require('dotenv').config();
+const express = require('express')
+const cors = require('cors')
+const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
-app.use(express.json());
-app.use(cors());
+const app = express()
+const PORT = process.env.PORT || 5000
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-});
+app.use(express.json())
+app.use(cors({ origin: true, credentials: true }))
+app.use(cookieParser())
 
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err.message);
-        process.exit(1);
-    }
-    console.log('Connected to the MySQL database');
-});
+const User = require('./Models/UserModel')
 
 app.get('/', (req, res) => {
-    return res.send("Backend is connected and database is accessible!"+ process.env.DB_NAME);
-});
-
-app.get('/users', (req, res) => {
-    const sql="select * from users";
-    db.query(sql,(err,data)=>{
-          if(err) return res.json(err);
-          return res.json(data);
-    })
-  });
-
-app.get('/api/users/:id', (req, res) => {
-  const sql = 'select name,password from users where id='+req.params.id;
-  db.query(sql,(err,data)=>{
-      if(err) {return res.json(err)};
-
-     if (data.length === 0) {
-      return res.status(401).json({ message: 'Unauthorized' }); 
-    }else{
-      return res.status(200).json({message : 'success',data,access_token:'hjdsdjndbyusdbjsdbsaidjsdbsadsduy'});
-    }      
-    })
-});
-
-
-app.post('/authorize', (req, res) => {
-  const sql = `select * from users where email='${req.body.email}' AND password='${req.body.password}'`;
-  db.query(sql,(err,data)=>{
-      if(err) {return res.json(err)};
-
-     if (data.length === 0) {
-      return res.status(200).json({ message: 'Unauthorized' }); 
-    }else{
-      return res.status(200).json({message : 'success',data,access_token:'hjdsdjndbyusdbjsdbsaidjsdbsadsduy'});
-    }      
-    })
-});
+  res.send('Backend is running!')
+})
 
 app.post('/register', (req, res) => {
-  const { email, password, name } = req.body;
+  const { name, email, password } = req.body
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required' })
+  }
 
-    if (!email || !password || !name) {
-      return res.status(400).json({ message: 'All fields are required' });
+  User.createUser({ name, email, password }, (err, data) => {
+    if (err) {
+      console.error('Error creating user:', err)
+      return res.status(500).json({ message: 'Database error', error: err })
+    }
+    res.status(201).json({ message: 'User registered successfully' })
+  })
+})
+
+app.post('/authorize', (req, res) => {
+  const { email, password } = req.body
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password required' })
+  }
+
+  User.getUserByCredentials(email, password, (err, user) => {
+    if (err) {
+      console.error('Login error:', err)
+      return res.status(500).json({ message: 'Database error', error: err })
     }
 
-    const insertSql = `INSERT INTO users (name, email, password) VALUES ('${name}', '${email}', '${password}')`;
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized' })
+    }
 
-    db.query(insertSql, (err, data) => {
-      if (err) return res.status(500).json({ message: 'Database error', error: err });
+    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'secretkey', { expiresIn: '1h' })
+    res.cookie('Token', token, { httpOnly: true, secure: false, sameSite: 'lax' })
 
-      return res.status(201).json({ message: 'User registered successfully' });
-  });
-});
+    res.status(200).json({
+      message: 'success',
+      user: user,
+      access_token: token
+    })
+  })
+})
+
+app.get('/read', (req, res) => {
+  try {
+    const token = req.cookies.Token
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' })
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secretkey')
+    res.json({ message: 'Token verified', decoded })
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid or expired token' })
+  }
+})
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+  console.log(`Server running on http://localhost:${PORT}`)
+})

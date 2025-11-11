@@ -8,13 +8,11 @@ export default function MovieDetail() {
 
     useEffect(() => {
         setCurrentMovieId(movieId);
-        console.log('Movie ID:', movieId);
     }, [movieId]);
     return (
         <>
             <Container className=' mt-5'>
                 <h1>Movie ID: {currentMovieId}</h1>
-
             </Container>
         </>
     );
