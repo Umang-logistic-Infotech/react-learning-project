@@ -1,64 +1,103 @@
-const db = require('../db')
-const bcrypt = require('bcrypt')
-require('dotenv').config()
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../db');
+const bcrypt = require('bcrypt');
+require('dotenv').config();
 
-const UserModel = {
-  getAllUsers: callback => {
-    db.query('SELECT * FROM users', callback)
+const User = sequelize.define('users', {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-
-  getUserById: (id, callback) => {
-    db.query('SELECT * FROM users WHERE id = ?', [id], callback)
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      isEmail: true,
+    },
   },
-
-  createUser: async (user, callback) => {
-    const { name, email, password } = user
-    try {
-      const saltRounds = parseInt(process.env.DB_PASSWORD_SALTROUNDS, 10) || 10
-      const salt = await bcrypt.genSalt(saltRounds)
-      const hashedPassword = await bcrypt.hash(password, salt)
-      db.query(
-        'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-        [name, email, hashedPassword],
-        callback
-      )
-    } catch (err) {
-      callback(err)
-    }
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
+}, {
+  timestamps: false,
+});
 
-  getUserByCredentials: (email, password, callback) => {
-    db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
-      if (err) return callback(err)
-      if (results.length === 0) return callback(null, null)
-      const user = results[0]
-      bcrypt.compare(password, user.password, (err, result) => {
-        if (err) return callback(err)
-        if (result) return callback(null, user)
-        return callback(null, null)
-      })
-    })
-  },
+User.beforeCreate(async (user) => {
+  const saltRounds = parseInt(process.env.DB_PASSWORD_SALTROUNDS);
+  const salt = await bcrypt.genSalt(saltRounds);
+  user.password = await bcrypt.hash(user.password, salt);
+});
 
-  updateUser: async (id, user, callback) => {
-    const { name, email, password } = user
-    try {
-      const saltRounds = parseInt(process.env.DB_PASSWORD_SALTROUNDS, 10) || 10
-      const salt = await bcrypt.genSalt(saltRounds)
-      const hashedPassword = await bcrypt.hash(password, salt)
-      db.query(
-        'UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?',
-        [name, email, hashedPassword, id],
-        callback
-      )
-    } catch (err) {
-      callback(err)
-    }
-  },
-
-  deleteUser: (id, callback) => {
-    db.query('DELETE FROM users WHERE id = ?', [id], callback)
+User.beforeUpdate(async (user) => {
+  if (user.changed('password')) {
+    const saltRounds = parseInt(process.env.DB_PASSWORD_SALTROUNDS);
+    const salt = await bcrypt.genSalt(saltRounds);
+    user.password = await bcrypt.hash(user.password, salt);
   }
-}
+});
 
-module.exports = UserModel
+User.prototype.comparePassword = async function (password) {
+  return bcrypt.compare(password, this.password);
+};
+
+User.getUserByCredentials = async (email, password) => {
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) return null;
+
+    const isMatch = await user.comparePassword(password);
+    if (isMatch){
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      };
+    };
+    return null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.getAllUsers = async () => {
+  try {
+    return await User.findAll();
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.getUserById = async (id) => {
+  try {
+    return await User.findByPk(id);
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.updateUser = async (id, userData) => {
+  try {
+    const user = await User.findByPk(id);
+    if (!user) return null;
+
+    return await user.update(userData);
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.deleteUser = async (id) => {
+  try {
+    const user = await User.findByPk(id);
+    if (!user) return null;
+
+    await user.destroy();
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = User;

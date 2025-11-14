@@ -35,37 +35,51 @@ function LoginPage() {
     }
   };
 
-    async function authorize() {
-      setLoading(true);
-      const payload = { email, password };
-      try {
-        const response = await axios.post("http://localhost:5000/authorize", payload);
-        if (response.data.message === 'success') {
-          const userData = {
-            name: response.data.user.name,
-            loggedIn: true,
-            access_token: response.data.access_token
-          };
-          setUser(userData);
-          localStorage.setItem('userContext', JSON.stringify(userData));
-          notify("Login successful!", 'success');
-          navigate("/home");
-        } else if (response.data.message === 'Unauthorized') {
-          notify("You are not registered.. please Sign Up First", 'error');
-        } else {
-          notify("Invalid email or password", 'error');
-        }
-      } catch (err) {
-        console.error(err);
-        if (err.response?.status === 401) {
-          notify("Invalid email or password", 'error');
-        } else {
-          notify("There was an error processing your request.", 'error');
-        }
-      } finally {
-        setLoading(false);
-      }
+async function authorize() {
+  setLoading(true);
+  const payload = { email, password };
+
+  try {
+    const response = await axios.post("http://localhost:5000/authorize", payload);
+
+    console.log(response.data);
+
+    if (response.data.message === 'Success') {
+      const userData = {
+        name: response.data.user.name,
+        loggedIn: true,
+        access_token: response.data.access_token
+      };
+
+      setUser(userData);
+      localStorage.setItem('userContext', JSON.stringify(userData));
+      notify("Login successful!", 'success');
+      navigate("/home");
+
+    } else if (response.data.message === 'Unauthorized') {
+      notify("Invalid email or password", 'error');
+    } else {
+      notify("There was an issue with the login process.", 'error');
     }
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.response) {
+      if (err.response.status === 401) {
+        notify("Invalid email or password", 'error');
+      } else {
+        notify("There was an error processing your request.", 'error');
+      }
+    } else {
+      notify("Network error or server is unavailable", 'error');
+    }
+  } finally {
+    setLoading(false);
+  }
+}
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
