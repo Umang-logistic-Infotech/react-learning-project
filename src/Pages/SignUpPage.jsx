@@ -29,7 +29,7 @@ function SignUpPage() {
     const payload = { name, email, password };
 
     try {
-      const response = await axios.post('http://localhost:5000/register', payload);
+      const response = await axios.post('http://localhost:1337/users', payload);
       if (response.data.message === 'User registered successfully') {
         toast.success("Registration successful",{position: "top-right",
         autoClose: 5000,

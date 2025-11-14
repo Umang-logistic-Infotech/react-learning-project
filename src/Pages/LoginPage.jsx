@@ -40,7 +40,7 @@ async function authorize() {
   const payload = { email, password };
 
   try {
-    const response = await axios.post("http://localhost:5000/authorize", payload);
+    const response = await axios.post("http://localhost:1337/authorize", payload);
 
     console.log(response.data);
 
