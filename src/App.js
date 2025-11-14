@@ -21,11 +21,14 @@ import CheckBox from "./Pages/CheckBox";
 import RadioButton from "./Pages/RadioButton";
 import { ToastContainer } from 'react-toastify';
 import UserContextProvider from "./context/UserContextProvider";
+import SubscribeUserPage from "./Pages/SubscribeUserPage";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 function App() {
 
   const ProtectedRoute = ({ children }) => {
-    const storedUser = localStorage.getItem("userContext");
+    const storedUser = sessionStorage.getItem("userContext");
     const isLoggedIn = storedUser ? JSON.parse(storedUser).loggedIn : false;
     if (!isLoggedIn) {
       return <Navigate to="/Login" replace />;
@@ -34,11 +37,58 @@ function App() {
   };
   
   const SignUpProtection = ({ children }) => {
-    const storedUser = localStorage.getItem("userContext");
+    const storedUser = sessionStorage.getItem("userContext");
     const isLoggedIn = storedUser ? JSON.parse(storedUser).loggedIn : false;
     if (isLoggedIn) {
       return <Navigate to="/Home" replace />;
     }
+    return children;
+  };
+
+  const SubscriptionProtectedRoute = ({ children }) => {
+    const [isSubscribed, setIsSubscribed] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      checkSubscription();
+    }, []);
+
+    const checkSubscription = async () => {
+      try {
+        const storedUser = sessionStorage.getItem("userContext");
+        if (!storedUser) {
+          setIsSubscribed(false);
+          setLoading(false);
+          return;
+        }
+
+        const userData = JSON.parse(storedUser);
+        const userId = userData.id;
+
+        const response = await axios.get(`http://localhost:1337/subscriptions/user/${userId}`);
+        
+        if (response.data) {
+          const validTill = new Date(response.data.validTill);
+          const today = new Date();
+          setIsSubscribed(validTill > today);
+        } else {
+          setIsSubscribed(false);
+        }
+      } catch (err) {
+        setIsSubscribed(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (loading) {
+      return <div>Loading...</div>;
+    }
+
+    if (!isSubscribed) {
+      return <Navigate to="/Subscribe" replace />;
+    }
+
     return children;
   };
 
@@ -74,13 +124,14 @@ function App() {
               <Route path="Program7" element={<Program7 />} />
               <Route path="Program8" element={<Program8 />} />
               <Route path="Program9" element={<Program9 />} />
-              <Route path="TheMovieDB" element={<TheMovieDB />} />
-              <Route path="TheMovieDB/:movieId" element={<MovieDetail />} />
+              <Route path="TheMovieDB" element={<SubscriptionProtectedRoute><TheMovieDB /></SubscriptionProtectedRoute>} />
+              <Route path="TheMovieDB/:movieId" element={<SubscriptionProtectedRoute><MovieDetail /></SubscriptionProtectedRoute>} />
               <Route path="labs" element={<Labs />} />
               <Route path="textfield" element={<TextField />} />
               <Route path="select" element={<Select />} />
               <Route path="checkbox" element={<CheckBox />} />
               <Route path="radio" element={<RadioButton />} />
+              <Route path="Subscribe" element={<SubscribeUserPage />} />
             </Route>
           </Routes>
         </Router>

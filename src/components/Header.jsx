@@ -19,7 +19,7 @@ function Header() {
   ];
 
   function handleLogout() {
-    localStorage.removeItem('userContext');
+    sessionStorage.removeItem('userContext');
       toast.info("Logout successful",{
           position: "top-right",
           autoClose: 5000,

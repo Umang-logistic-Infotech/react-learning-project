@@ -52,7 +52,7 @@ async function authorize() {
       };
 
       setUser(userData);
-      localStorage.setItem('userContext', JSON.stringify(userData));
+      sessionStorage.setItem('userContext', JSON.stringify(userData));
       notify("Login successful!", 'success');
       navigate("/home");
 

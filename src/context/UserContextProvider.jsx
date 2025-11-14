@@ -6,7 +6,7 @@ const UserContextProvider = ({ children }) => {
   const [user, setUser] = useState({ name: '', loggedIn: false, access_token: '' });
 
   useEffect(() => {
-    const raw = localStorage.getItem('userContext');
+    const raw = sessionStorage.getItem('userContext');
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
@@ -18,15 +18,15 @@ const UserContextProvider = ({ children }) => {
   }, []);
   useEffect(() => {
     if (user.loggedIn) {
-      localStorage.setItem('userContext', JSON.stringify(user));
+      sessionStorage.setItem('userContext', JSON.stringify(user));
     } else {
-      localStorage.removeItem('userContext');
+      sessionStorage.removeItem('userContext');
     }
   }, [user]);
 
   const logout = () => {
     setUser({ name: '', loggedIn: false, access_token: '' });
-    localStorage.removeItem('userContext');
+    sessionStorage.removeItem('userContext');
   };
 
   return (
