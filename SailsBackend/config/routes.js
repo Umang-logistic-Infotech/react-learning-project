@@ -26,6 +26,10 @@ module.exports.routes = {
   'POST /authorize': 'UserController.authorize',
   'PUT /users/:id': 'UserController.updateUser',
   'DELETE /users/:id': 'UserController.deleteUser',
+
+
+  'POST /subscribe': 'SubscribedUserController.subscribeUser',
+  'GET /check-subscription/': 'SubscribedUserController.checkUserSubscription',
   /***************************************************************************
   *                                                                          *
   * More custom routes here...                                               *

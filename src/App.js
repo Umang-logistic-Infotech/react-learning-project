@@ -21,6 +21,7 @@ import CheckBox from "./Pages/CheckBox";
 import RadioButton from "./Pages/RadioButton";
 import { ToastContainer } from 'react-toastify';
 import UserContextProvider from "./context/UserContextProvider";
+import SubscriptionPage from "./Pages/SubscriptionPage";
 
 function App() {
 
@@ -75,6 +76,7 @@ function App() {
               <Route path="Program8" element={<Program8 />} />
               <Route path="Program9" element={<Program9 />} />
               <Route path="TheMovieDB" element={<TheMovieDB />} />
+              <Route path="subscription" element={<SubscriptionPage />} />
               <Route path="TheMovieDB/:movieId" element={<MovieDetail />} />
               <Route path="labs" element={<Labs />} />
               <Route path="textfield" element={<TextField />} />

@@ -47,7 +47,7 @@ User.getUserByCredentials = async (email, password) => {
   try {
     const user = await User.findOne({ where: { email } });
     if (!user) return null;
-
+    
     const isMatch = await user.comparePassword(password);
     if (isMatch) {
       return {
