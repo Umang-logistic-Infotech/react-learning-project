@@ -15,15 +15,11 @@ function SubscriptionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  // useEffect(() => {
-  //   // if (!user.loggedIn) {
-  //   //   toast.error("Please login to access subscriptions");
-  //   //   navigate('/login');
-  //   //   return;
-  //   // }
-  //   checkSubscription();
-  // }, []);
-//   console.log('User from subscribe page : ', user);
+  useEffect(() => {
+    if (user?.access_token) {
+      checkSubscription();
+    }
+  }, [user?.access_token]);
 
   const notify = (message, type) => {
     const options = {
@@ -51,25 +47,26 @@ function SubscriptionPage() {
     { id: 12, name: '1 Year', duration: 12, price: '₹799' }
   ];
 
-  // async function checkSubscription() {
-  //   try {
-  //     const response = await axios.get('http://localhost:1337/check-subscription', {
-  //         token:  user.access_token
-  //     });
+  async function checkSubscription() {
+    try {
+      const response = await axios.post('http://localhost:1337/check-subscription', {
+        token: user?.access_token
+      });
 
-  //     if (response.data.valid) {
-  //       setSubscription(response.data.subscription);
-  //     }
+      if (response.data.valid) {
+        setSubscription(response.data.subscription);
+        sessionStorage.setItem('MovieSubscribed' ,true);
+        console.log(response.data.subscription);
+      }
       
-  //     setLoading(false);
-  //   } catch (err) {
-  //     console.error(err);
-  //   //   notify('Error loading subscription status', 'error');
-  //     setLoading(false);
-  //   }
-  // }
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  }
 
-    async function subscribe() {
+  async function subscribe() {
     if (!selectedPlan) {
         notify('Please select a plan', 'error');
         return;
@@ -109,8 +106,7 @@ function SubscriptionPage() {
     } finally {
         setSubmitting(false);
     }
-    }
-
+  }
 
   const handleSubscribe = () => {
     subscribe();
@@ -137,7 +133,7 @@ function SubscriptionPage() {
   }
 
   return (
-    <Container className={`d-flex flex-column justify-content-center align-items-center ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'} min-vh-100 py-5`}>
+    <Container className={`d-flex flex-column justify-content-center align-items-center ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'} min-vh-80 py-5`}>
       <div className="text-center mb-4">
         <h2>Subscription Portal</h2>
         <p className="mt-3">Welcome, <strong>{user.name}</strong></p>
@@ -159,20 +155,12 @@ function SubscriptionPage() {
             <p className="text-muted small">
               Your subscription is currently active and will remain valid until the date shown above.
             </p>
-            <div className="text-center mt-3">
-              <Button 
-                variant={theme === 'dark' ? 'outline-light' : 'outline-dark'}
-                onClick={() => navigate('/home')}
-              >
-                Go to Home
-              </Button>
-            </div>
           </Card.Body>
         </Card>
       ) : (
         <div className="w-100">
           <Alert variant={theme === 'dark' ? 'secondary' : 'info'} className="text-center mb-4">
-            <Alert.Heading>Subscribe to Access Premium Features</Alert.Heading>
+            <Alert.Heading>Subscribe to Access Movie DB Features</Alert.Heading>
             <p className="mb-0">Choose a plan below to get started</p>
           </Alert>
 
@@ -180,8 +168,8 @@ function SubscriptionPage() {
             {plans.map((plan) => (
               <Col key={plan.id} md={3} sm={6} className="mb-3">
                 <Card
-                  className={`h-100 ${selectedPlan === plan.duration ? 'border-primary border-3' : ''} ${theme === 'dark' ? 'bg-dark text-light' : ''}`}
-                  style={{ cursor: 'pointer', transition: 'all 0.3s' }}
+                  className={`h-75 ${selectedPlan === plan.duration ? 'border-primary border-3' : ''} ${theme === 'dark' ? 'bg-dark text-light' : ''}`}
+                  style={{ cursor: 'pointer' }}
                   onClick={() => setSelectedPlan(plan.duration)}
                 >
                   <Card.Body className="text-center d-flex flex-column justify-content-between">
@@ -226,10 +214,6 @@ function SubscriptionPage() {
               </ul>
             </Card.Body>
           </Card>
-
-          <div className="mt-4 text-center">
-            <span><a href="/home">Back to Home</a></span>
-          </div>
         </div>
       )}
     </Container>

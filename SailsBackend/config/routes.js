@@ -29,7 +29,8 @@ module.exports.routes = {
 
 
   'POST /subscribe': 'SubscribedUserController.subscribeUser',
-  'GET /check-subscription/': 'SubscribedUserController.checkUserSubscription',
+  'POST /isSubscribed': 'SubscribedUserController.isSubscribed',
+  'POST /check-subscription/': 'SubscribedUserController.checkUserSubscription',
   /***************************************************************************
   *                                                                          *
   * More custom routes here...                                               *

@@ -18,7 +18,7 @@ function Sidebar() {
     { path: '/Program8', label: 'Program 8' },
     { path: '/Program9', label: 'Program 9' },
     { path: '/TheMovieDB', label: 'The Movie DB' },
-    { path: '/Subscribe', label: 'Sub Scribed Users' },
+    { path: '/subscription', label: 'Subscription' },
   ];
 
   return (

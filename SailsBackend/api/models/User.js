@@ -1,43 +1,29 @@
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../services/sequelize');  
+
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
-module.exports = {
-  tableName: 'users',
-  
-  attributes: {
-    name: {
-      type: 'string',
-      required: true
-    },
-    
-    email: {
-      type: 'string',
-      required: true,
-      unique: true,
-      isEmail: true
-    },
-    
-    password: {
-      type: 'string',
-      required: true
-    },
-    
-    subscription: {
-      collection: 'subscribedusers',
-      via: 'user'
-    }
+const User = sequelize.define('users', {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-
-  beforeCreate: async function(values, proceed) {
-    try {
-      const saltRounds = parseInt(process.env.DB_PASSWORD_SALTROUNDS || 10);
-      const salt = await bcrypt.genSalt(saltRounds);
-      values.password = await bcrypt.hash(values.password, salt);
-      return proceed();
-    } catch (error) {
-      return proceed(error);
-    }
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      isEmail: true,
+    },
   },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  timestamps: false, 
+});
 
 User.beforeCreate(async (user) => {
   const saltRounds = parseInt(process.env.DB_PASSWORD_SALTROUNDS || 10);
@@ -70,17 +56,50 @@ User.getUserByCredentials = async (email, password) => {
         name: user.name
       };
     }
-  },
-
-  customToJSON: function() {
-    return {
-      id: this.id,
-      name: this.name,
-      email: this.email
-    };
-  },
-
-  comparePassword: async function(password, hashedPassword) {
-    return await bcrypt.compare(password, hashedPassword);
+    return null;
+  } catch (error) {
+    throw error;
   }
 };
+
+User.getAllUsers = async () => {
+  try {
+    
+    return await User.findAll();
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.getUserById = async (id) => {
+  try {
+    return await User.findByPk(id);
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.updateUser = async (id, userData) => {
+  try {
+    const user = await User.findByPk(id);
+    if (!user) return null;
+
+    return await user.update(userData);
+  } catch (error) {
+    throw error;
+  }
+};
+
+User.deleteUser = async (id) => {
+  try {
+    const user = await User.findByPk(id);
+    if (!user) return null;
+
+    await user.destroy();
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = User;

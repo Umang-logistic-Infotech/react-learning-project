@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useTheme } from "../context/ThemeContextProvider";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function TheMovieDB() {
     const { theme } = useTheme();
@@ -10,6 +11,37 @@ export default function TheMovieDB() {
     const [totalPages, setTotalPages] = useState(0);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const isValid = sessionStorage.getItem('MovieSubscribed') === 'true';
+
+        if (!isValid) {
+            const user = JSON.parse(sessionStorage.getItem('userContext'));
+            checkSubscription(user);
+        } else {
+            fetchMovies();
+        }
+    }, []);
+
+    const checkSubscription = async (user) => {
+        try {
+            const response = await axios.post('http://localhost:1337/check-subscription', {
+                token: user?.access_token
+            });
+
+            if (response.data.valid) {
+                sessionStorage.setItem('MovieSubscribed', 'true');
+                fetchMovies();
+            } else {
+                sessionStorage.setItem('MovieSubscribed', 'false');
+                navigate("/subscription", { replace: true });
+            }
+        } catch (err) {
+            console.error(err);
+            navigate("/subscription");
+        }
+    };
 
     const token = process.env.REACT_APP_ACCESS_TOKEN;
 
@@ -42,17 +74,12 @@ export default function TheMovieDB() {
         setPage((prevPage) => prevPage + 1);
     }
 
-    useEffect(() => {
-        fetchMovies();
-        // eslint-disable-next-line
-    }, [page]);
-
     return (
-        <div 
+        <div
             className={`${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`}
             style={{ paddingBottom: '2rem' }}
         >
-            <Container fluid className="">
+            <Container fluid>
                 <h1 className="text-center mb-4">
                     Movie List (Page {page} of {totalPages})
                 </h1>
@@ -81,7 +108,7 @@ export default function TheMovieDB() {
                                             className={`movie-card shadow rounded ${
                                                 theme === "dark" ? "bg-secondary text-light" : "bg-white border"
                                             } position-relative text-center p-3`}
-                                            style={{ 
+                                            style={{
                                                 transition: "transform 0.3s, box-shadow 0.3s", 
                                                 height: "100%",
                                                 minHeight: "400px"

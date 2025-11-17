@@ -20,6 +20,7 @@ function Header() {
 
   function handleLogout() {
     sessionStorage.removeItem('userContext');
+    sessionStorage.removeItem('MovieSubscribed');
       toast.info("Logout successful",{
           position: "top-right",
           autoClose: 5000,

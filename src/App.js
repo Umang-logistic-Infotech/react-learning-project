@@ -21,8 +21,9 @@ import CheckBox from "./Pages/CheckBox";
 import RadioButton from "./Pages/RadioButton";
 import { ToastContainer } from 'react-toastify';
 import UserContextProvider from "./context/UserContextProvider";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import SubscriptionPage from "./Pages/SubscriptionPage";
-
 function App() {
 
   const ProtectedRoute = ({ children }) => {
@@ -130,7 +131,7 @@ function App() {
               <Route path="select" element={<Select />} />
               <Route path="checkbox" element={<CheckBox />} />
               <Route path="radio" element={<RadioButton />} />
-              <Route path="Subscribe" element={<SubscribeUserPage />} />
+              {/* <Route path="Subscribe" element={<SubscribeUserPage />} /> */}
             </Route>
           </Routes>
         </Router>

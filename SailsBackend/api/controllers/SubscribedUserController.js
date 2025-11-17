@@ -31,10 +31,9 @@ module.exports = {
   checkUserSubscription: async (req, res) => {
     try {
       const { token } = req.body;
-
+      
       const tokenData = jwt.verify(token,process.env.JWT_SECRET);
       const userId = tokenData.id;
-      console.log(userId);
 
       const subscription = await SubscribedUser.getUserSubscription(userId);
       console.log(subscription);
@@ -43,6 +42,32 @@ module.exports = {
         return res.status(200).json({
           valid: true,
           subscription
+        });
+      } else {
+        return res.status(200).json({
+          valid: false,
+        });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        message: 'Error checking user subscription',
+        error: error.message
+      });
+    }
+  },
+
+  isSubscribed: async (req, res) => {
+    try {
+      const { token } = req.body;
+      
+      const tokenData = jwt.verify(token,process.env.JWT_SECRET);
+      const userId = tokenData.id;
+
+      const subscription = await SubscribedUser.getUserSubscription(userId);
+
+      if (subscription) {
+        return res.status(200).json({
+          valid: true,
         });
       } else {
         return res.status(200).json({
