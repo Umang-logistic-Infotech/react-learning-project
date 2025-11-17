@@ -21,9 +21,7 @@ import CheckBox from "./Pages/CheckBox";
 import RadioButton from "./Pages/RadioButton";
 import { ToastContainer } from 'react-toastify';
 import UserContextProvider from "./context/UserContextProvider";
-import SubscribeUserPage from "./Pages/SubscribeUserPage";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import SubscriptionPage from "./Pages/SubscriptionPage";
 
 function App() {
 
@@ -124,8 +122,9 @@ function App() {
               <Route path="Program7" element={<Program7 />} />
               <Route path="Program8" element={<Program8 />} />
               <Route path="Program9" element={<Program9 />} />
-              <Route path="TheMovieDB" element={<SubscriptionProtectedRoute><TheMovieDB /></SubscriptionProtectedRoute>} />
-              <Route path="TheMovieDB/:movieId" element={<SubscriptionProtectedRoute><MovieDetail /></SubscriptionProtectedRoute>} />
+              <Route path="TheMovieDB" element={<TheMovieDB />} />
+              <Route path="subscription" element={<SubscriptionPage />} />
+              <Route path="TheMovieDB/:movieId" element={<MovieDetail />} />
               <Route path="labs" element={<Labs />} />
               <Route path="textfield" element={<TextField />} />
               <Route path="select" element={<Select />} />

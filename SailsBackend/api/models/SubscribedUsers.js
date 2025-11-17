@@ -1,43 +1,59 @@
-require('dotenv').config();
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../services/sequelize');  
 
-module.exports = {
-  tableName: 'subscribedusers',
-  
-  attributes: {
-    userId: {
-      type: 'number',
-      required: true,
-      unique: true,
-      columnName: 'userId'
-    },
-    
-    user: {
-      model: 'user',
-      columnName: 'userId'
-    },
-    
-    subscribedAt: {
-      type: 'ref',
-      columnType: 'datetime'
-    },
-    
-    validTill: {
-      type: 'ref',
-      columnType: 'datetime'
-    }
+const SubscribedUser = sequelize.define('subscribedusers', {
+  id: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    primaryKey: true,
+    autoIncrement: true,
   },
+  userId: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: false,
+    unique: true,
+    references: {
+      model: 'users',
+      key: 'id',
+    },
+    onDelete: 'CASCADE',
+  },
+  subscribedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: Sequelize.NOW,
+  },
+  validTill: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  }
+}, {
+  timestamps: false,
+});
 
-  beforeCreate: async function(values, proceed) {
-    try {
-      const userExists = await User.findOne({ id: values.userId });
-      
-      if (!userExists) {
-        return proceed(new Error(`User with id ${values.userId} does not exist`));
+SubscribedUser.getUserSubscription = async (userId) => {
+  try {
+    return await SubscribedUser.findOne({
+      where: {
+        userId: userId,
+        validTill: {
+          [Sequelize.Op.gt]: new Date(),
+        }
       }
-      
-      return proceed();
-    } catch (error) {
-      return proceed(error);
-    }
+    });
+  } catch (error) {
+    throw error;
   }
 };
+
+SubscribedUser.createSubscription = async (userId, validTill) => {
+  try {
+    return await SubscribedUser.create({
+      userId,
+      validTill
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = SubscribedUser;

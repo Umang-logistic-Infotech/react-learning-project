@@ -115,12 +115,7 @@ module.exports = {
         { expiresIn: '1h' }
       );
 
-      res.cookie('Token123', "tenodjksndsadywsgduysa");
-      res.cookie('Token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-      });
+      res.cookie('Token', token);
 
       return res.status(200).json({
         message: 'Success',

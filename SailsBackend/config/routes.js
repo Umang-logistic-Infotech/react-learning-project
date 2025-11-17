@@ -26,17 +26,10 @@ module.exports.routes = {
   'POST /authorize': 'UserController.authorize',
   'PUT /users/:id': 'UserController.updateUser',
   'DELETE /users/:id': 'UserController.deleteUser',
-  
-  
-  // Subscribed User Routes
-  'GET /subscriptions': 'SubscribedUsersController.getAllSubscriptions',
-  'GET /subscriptions/:id': 'SubscribedUsersController.getSubscriptionById',
-  'GET /subscriptions/user/:userId': 'SubscribedUsersController.getSubscriptionByUserId',
-  'POST /subscriptions': 'SubscribedUsersController.createSubscription',
-  'PUT /subscriptions/:id': 'SubscribedUsersController.updateSubscription',
-  'DELETE /subscriptions/:id': 'SubscribedUsersController.deleteSubscription',
-  'DELETE /subscriptions/user/:userId': 'SubscribedUsersController.deleteSubscriptionByUserId',
 
+
+  'POST /subscribe': 'SubscribedUserController.subscribeUser',
+  'GET /check-subscription/': 'SubscribedUserController.checkUserSubscription',
   /***************************************************************************
   *                                                                          *
   * More custom routes here...                                               *
