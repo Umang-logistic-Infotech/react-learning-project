@@ -32,15 +32,15 @@ function SignUpPage() {
       const response = await axios.post('http://localhost:1337/users', payload);
       if (response.data.message === 'User registered successfully') {
         toast.success("Registration successful",{position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: {theme},
-    });
-        navigate("/login");
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: {theme},
+      });
+        navigate(-1);
       }
     } catch (err) {
       toast.error("Error occurred. Please try again");

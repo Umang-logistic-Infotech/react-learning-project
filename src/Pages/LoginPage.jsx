@@ -42,7 +42,6 @@ async function authorize() {
   try {
     const response = await axios.post("http://localhost:1337/authorize", payload);
 
-    console.log(response.data);
 
     if (response.data.message === 'Success') {
       const userData = {

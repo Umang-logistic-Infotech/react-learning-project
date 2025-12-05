@@ -6,6 +6,7 @@ module.exports = {
     try {
       const {  validTill , token } = req.body;
       const tokenData = jwt.verify(token,process.env.JWT_SECRET);
+      
       const userId = tokenData.id;
       const existingSubscription = await SubscribedUser.getUserSubscription(userId);
       if (existingSubscription) {
@@ -36,7 +37,6 @@ module.exports = {
       const userId = tokenData.id;
 
       const subscription = await SubscribedUser.getUserSubscription(userId);
-      console.log(subscription);
 
       if (subscription) {
         return res.status(200).json({

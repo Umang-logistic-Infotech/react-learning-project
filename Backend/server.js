@@ -60,16 +60,13 @@ app.post('/authorize', async (req, res) => {
 app.get('/read', (req, res) => {
   try {
     const token = req.cookies.Token;
-    console.log("hello token",token);
 
     if (!token) {
-      console.log("not token",token);
 
       return res.status(401).json({ message: 'No token provided' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("hello token",token);
     
     res.json({ message: 'Token verified', decoded });
   } catch (err) {

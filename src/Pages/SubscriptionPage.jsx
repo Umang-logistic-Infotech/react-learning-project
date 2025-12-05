@@ -56,7 +56,6 @@ function SubscriptionPage() {
       if (response.data.valid) {
         setSubscription(response.data.subscription);
         sessionStorage.setItem('MovieSubscribed' ,true);
-        console.log(response.data.subscription);
       }
       
       setLoading(false);
@@ -87,7 +86,7 @@ function SubscriptionPage() {
         notify('Subscription successful!', 'success');
         setSubscription(response.data.subscription);
         setSelectedPlan(null);
-        navigate('/home');
+        navigate(-1);
         } else {
         notify(response.data.message || 'Subscription failed', 'error');
         }
